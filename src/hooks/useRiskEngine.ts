@@ -17,6 +17,7 @@ export function useRiskEngine(
   forecast: ForecastResult | undefined,
   health: HealthProfile,
   customThresholdOffset: number,
+  neighborhoodAdjustment = 0,
 ): RiskEngineResult {
   return useMemo(() => {
     if (!forecast) return { today: null, hourly: [] }
@@ -25,11 +26,12 @@ export function useRiskEngine(
       apparentTemperature: forecast.current.apparentTemperature,
       health,
       customThresholdOffset,
+      neighborhoodAdjustment,
       isNight: isNightHour(new Date().toISOString()),
     })
 
     const profileAdjustment = calculateProfileAdjustment(health)
-    const totalAdjustment = profileAdjustment + customThresholdOffset
+    const totalAdjustment = profileAdjustment + customThresholdOffset + neighborhoodAdjustment
 
     const hourly: HourlyPoint[] = forecast.hourly.map((point) => ({
       ...point,
@@ -37,5 +39,5 @@ export function useRiskEngine(
     }))
 
     return { today, hourly }
-  }, [forecast, health, customThresholdOffset])
+  }, [forecast, health, customThresholdOffset, neighborhoodAdjustment])
 }

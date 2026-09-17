@@ -58,3 +58,25 @@ export interface RiskAssessment {
   thresholdAdjustment: number
   recommendations: string[]
 }
+
+export type ShadeBucket = 'muy_baja' | 'baja' | 'media' | 'alta' | 'muy_alta'
+export type VulnerabilityLevel = 'Vulnerabilidad Baja' | 'Vulnerabilidad Media' | 'Vulnerabilidad Alta'
+
+/**
+ * Contexto de barrio para Valencia, a partir de datos abiertos del Ajuntament
+ * (ver src/lib/geo/valenciaNeighborhoods.ts). No existe para otras ciudades.
+ */
+export interface NeighborhoodContext {
+  nombre: string
+  distrito: string | null
+  sombraBucket: ShadeBucket | null
+  arbolesPerKm2: number | null
+  vulnerabilidadGlobal: VulnerabilityLevel | null
+  /** Ajuste estimado en °C por baja cobertura arbórea, ya limitado a un rango conservador. */
+  thresholdAdjustment: number
+}
+
+export interface NearbyFountain {
+  calle: string | null
+  distanceMeters: number
+}

@@ -4,11 +4,13 @@ import { Card, GroupedList, GroupedRow } from '../ui/Card'
 import { ProfileStep } from '../onboarding/ProfileStep'
 import { useProfileStore } from '../../store/useProfileStore'
 import { calculateProfileAdjustment } from '../../lib/riskEngine'
+import { useNeighborhoodContext } from '../../hooks/useNeighborhoodContext'
 
 export function ProfileScreen() {
   const location = useProfileStore((s) => s.location)
   const health = useProfileStore((s) => s.health)
   const updateHealth = useProfileStore((s) => s.updateHealth)
+  const { data: neighborhood } = useNeighborhoodContext(location)
 
   const adjustment = calculateProfileAdjustment(health)
 
@@ -43,6 +45,13 @@ export function ProfileScreen() {
               , el nivel de riesgo puede subir con menos temperatura que a otra persona. Esto no es un diagnóstico
               médico: es una guía para ayudarte a decidir cómo organizar tu día.
             </p>
+            {neighborhood && (
+              <p className="mt-3 text-[16px] leading-snug">
+                Además, en {neighborhood.nombre} usamos datos abiertos del Ajuntament de València sobre cobertura de
+                sombra y arbolado para estimar si tu barrio suele sentirse un poco más caluroso o más fresco que el
+                dato oficial.
+              </p>
+            )}
           </Card>
         </div>
       </main>

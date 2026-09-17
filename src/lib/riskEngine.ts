@@ -69,6 +69,8 @@ export interface AssessRiskInput {
   apparentTemperature: number
   health: HealthProfile
   customThresholdOffset?: number
+  /** Ajuste hiperlocal (ej. microclima de barrio en Valencia). Ver src/lib/geo/valenciaNeighborhoods.ts. */
+  neighborhoodAdjustment?: number
   isNight?: boolean
 }
 
@@ -76,10 +78,11 @@ export function assessRisk({
   apparentTemperature,
   health,
   customThresholdOffset = 0,
+  neighborhoodAdjustment = 0,
   isNight = false,
 }: AssessRiskInput): RiskAssessment {
   const profileAdjustment = calculateProfileAdjustment(health)
-  const thresholdAdjustment = profileAdjustment + customThresholdOffset
+  const thresholdAdjustment = profileAdjustment + customThresholdOffset + neighborhoodAdjustment
   const effectiveApparentTemperature = apparentTemperature + thresholdAdjustment
   const level = classifyRiskLevel(effectiveApparentTemperature)
   const recommendations = buildRecommendations(level, health, isNight)

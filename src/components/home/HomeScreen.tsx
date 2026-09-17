@@ -5,9 +5,11 @@ import { Badge } from '../ui/Badge'
 import { RiskCard } from './RiskCard'
 import { HourlyForecastStrip } from './HourlyForecastStrip'
 import { RecommendationList } from './RecommendationList'
+import { NeighborhoodSection } from './NeighborhoodSection'
 import { useProfileStore } from '../../store/useProfileStore'
 import { useWeather } from '../../hooks/useWeather'
 import { useRiskEngine } from '../../hooks/useRiskEngine'
+import { useNeighborhoodContext, useNearbyFountains } from '../../hooks/useNeighborhoodContext'
 import type { HourlyPoint } from '../../types'
 
 type ViewMode = 'today' | 'upcoming'
@@ -47,7 +49,9 @@ export function HomeScreen() {
   const customThresholdOffset = useProfileStore((s) => s.alerts.customThresholdOffset)
 
   const { data: forecast, isLoading, isError } = useWeather(location)
-  const { today, hourly } = useRiskEngine(forecast, health, customThresholdOffset)
+  const { data: neighborhood } = useNeighborhoodContext(location)
+  const { data: fountains } = useNearbyFountains(location)
+  const { today, hourly } = useRiskEngine(forecast, health, customThresholdOffset, neighborhood?.thresholdAdjustment)
   const upcoming = useMemo(() => summarizeByDay(hourly), [hourly])
 
   const cityLabel = location?.name ?? 'tu ubicación'
@@ -78,6 +82,7 @@ export function HomeScreen() {
             <RiskCard cityLabel={cityLabel} apparentTemperature={forecast.current.apparentTemperature} assessment={today} />
             <HourlyForecastStrip hours={hourly} />
             <RecommendationList recommendations={today.recommendations} />
+            {neighborhood && <NeighborhoodSection neighborhood={neighborhood} fountains={fountains ?? []} />}
           </>
         )}
 

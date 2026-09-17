@@ -21,8 +21,10 @@ Onboarding corto (ubicación + 4 preguntas de salud), pantalla "Hoy" (sensación
 riesgo + recomendaciones), franja horaria de 24h, umbral de alerta configurable, PWA
 instalable. Local-first: **sin backend**, todo vive en `localStorage` del dispositivo.
 
-Fuera de alcance v1: mapa de refugios, multi-idioma, cuentas/login, frío extremo o
-calidad de aire por incendios, empaquetado nativo real.
+Fuera de alcance v1: multi-idioma, cuentas/login, frío extremo o calidad de aire por
+incendios, empaquetado nativo real. La excepción es Valencia: ver "Capa de barrio
+(Valencia)" más abajo — ahí sí hay una primera versión de contexto hiperlocal y
+fuentes de agua cercanas, porque el ayuntamiento ya publica esos datos abiertos.
 
 ## Usuario objetivo
 
@@ -42,8 +44,11 @@ manifest/service worker, `lucide-react` para iconografía de sistema.
 - Tipografía: font stack de sistema (`-apple-system, ...`), nunca se embebe SF Pro.
 - Dark mode como identidad visual por defecto: fondo casi negro con temperatura de
   color (`#0B0E14`), gradiente radial sutil (`src/index.css`).
-- Cards en vidrio esmerilado: `backdrop-filter: blur(20px)`, doble sombra
-  (ambiental + contacto). Ver clase `.glass-surface`.
+- El texto vive directo sobre el gradiente de fondo, separado con líneas finas
+  (`border-white/10`, `divide-y`) en vez de cajas rellenas. La única superficie real
+  (`.sheet-surface`: vidrio esmerilado con `backdrop-filter: blur(20px)` y doble
+  sombra) es el `BottomSheet`, porque un modal sí necesita distinguirse del
+  contenido de atrás.
 - El dato hero (temperatura, sensación térmica) domina la pantalla: 72–96px, bold/black.
 - Icono hero con animación sutil de flotación (`.hero-float`), desactivada
   automáticamente con `prefers-reduced-motion`.
@@ -73,6 +78,41 @@ de un lanzamiento real.
   (+2), sin AC en casa (+2, más relevante de noche).
 - El usuario puede sumar un ajuste manual (`alerts.customThresholdOffset`) desde la
   pantalla de Alertas.
+- Si hay contexto de barrio (ver abajo), su `thresholdAdjustment` se suma por separado
+  (no está capado junto con el de perfil): ver `useRiskEngine`.
+
+## Capa de barrio (Valencia)
+
+Kaló empezó como "Open-Meteo con mejor diseño" — un dato genérico, igual que la alerta
+que ya manda el ayuntamiento. `src/lib/geo/valenciaNeighborhoods.ts` es el primer paso
+hacia algo hiperlocal: usa datos abiertos reales del Ajuntament de València
+(`opendata.vlci.valencia.es`, plataforma CKAN) para saber en qué barrio cae la
+ubicación del usuario y ajustar la sensación térmica con eso.
+
+- **Datos**: `public/data/valencia-barrios.geojson` (88 barrios: límites, cobertura de
+  sombra/arbolado, vulnerabilidad social) y `public/data/valencia-fuentes.geojson` (832
+  fuentes de agua pública). Son una foto simplificada y fusionada de datasets públicos
+  del ayuntamiento, procesados igual que el proyecto open source
+  [`valencia-refresca`](https://github.com/celiarozalenm/valencia-refresca) (misma
+  fuente, mismo criterio). **No son en tiempo real**: hay que re-descargarlos
+  periódicamente si el ayuntamiento actualiza sus datasets.
+- **Alcance**: solo Valencia. `isWithinValencia(lat, lon)` filtra por bounding box antes
+  de cualquier fetch; fuera de esa zona todo el módulo devuelve `null` y el resto de la
+  app funciona exactamente igual que para cualquier otra ciudad.
+- **Qué SÍ ajustamos**: un offset chico y conservador (±0.5° a +1.5°) según la cobertura
+  de sombra/arbolado del barrio — es una estimación basada en el efecto documentado de
+  islas de calor urbana, no una medición real de temperatura por barrio.
+- **Qué NO ajustamos**: el índice de vulnerabilidad social (`vulnerabilidadGlobal`) es
+  demográfico/económico, no térmico — se muestra aparte, nunca se mezcla con la
+  sensación térmica, para no confundir "barrio pobre" con "barrio caliente".
+- **Nunca inventar ubicaciones de refugios o servicios**: si en el futuro se agrega la
+  red oficial de "Refugios Climáticos" (Decreto 150/2025 de la Generalitat, catálogo en
+  `dadesobertes.gva.es`), hay que sacar los datos reales de esa fuente — no completar
+  direcciones o coordenadas de memoria. Es información de seguridad durante una ola de
+  calor; un dato mal recordado ahí es peor que no mostrarlo.
+- **Este patrón es reusable**: para agregar otra ciudad con datos abiertos similares,
+  el criterio es el mismo: bounding box + polígonos de barrio + point-in-polygon
+  (`src/lib/geo/geometry.ts`), sin acoplar nada de esto al risk engine genérico.
 
 ## Estructura
 
@@ -82,12 +122,15 @@ src/
   components/home/       # Pantalla "Hoy"
   components/onboarding/ # Flujo de bienvenida
   components/settings/   # Alertas y Perfil
-  hooks/                 # useWeather, useAirQuality, useGeolocation, useRiskEngine
+  hooks/                 # useWeather, useAirQuality, useGeolocation, useRiskEngine,
+                         # useNeighborhoodContext (barrio + fuentes cercanas)
   lib/api/               # Cliente de Open-Meteo (forecast, air quality, geocoding)
   lib/storage/           # Persistencia en localStorage
   lib/riskEngine.ts      # Motor de riesgo puro
+  lib/geo/               # point-in-polygon, haversine, capa de barrio de Valencia
   store/                 # Zustand (useProfileStore)
   types/                 # Tipos compartidos
+public/data/             # GeoJSON de Valencia (barrios + fuentes de agua)
 ```
 
 ## APIs (todas gratuitas, sin API key)
