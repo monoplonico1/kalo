@@ -1,0 +1,51 @@
+import { MapPin } from 'lucide-react'
+import { NavigationBar } from '../ui/NavigationBar'
+import { Card, GroupedList, GroupedRow } from '../ui/Card'
+import { ProfileStep } from '../onboarding/ProfileStep'
+import { useProfileStore } from '../../store/useProfileStore'
+import { calculateProfileAdjustment } from '../../lib/riskEngine'
+
+export function ProfileScreen() {
+  const location = useProfileStore((s) => s.location)
+  const health = useProfileStore((s) => s.health)
+  const updateHealth = useProfileStore((s) => s.updateHealth)
+
+  const adjustment = calculateProfileAdjustment(health)
+
+  return (
+    <div className="flex min-h-full flex-col">
+      <NavigationBar title="Perfil" />
+      <main className="flex flex-1 flex-col gap-5 px-4 py-4 pb-24">
+        {location && (
+          <GroupedList>
+            <GroupedRow className="gap-3">
+              <MapPin size={20} className="text-[var(--color-secondary-label)]" aria-hidden />
+              <span className="text-[17px]">{location.name}</span>
+            </GroupedRow>
+          </GroupedList>
+        )}
+
+        <ProfileStep
+          health={health}
+          onChange={updateHealth}
+          title="Tu perfil de salud"
+          description="Podés actualizar esto cuando quieras."
+        />
+
+        <div>
+          <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">
+            Cómo calculamos tu riesgo
+          </h2>
+          <Card>
+            <p className="text-[16px] leading-snug">
+              Empezamos con la sensación térmica del día. Como tu perfil suma{' '}
+              <strong>{adjustment > 0 ? `${adjustment}° de sensibilidad extra` : 'ninguna sensibilidad extra'}</strong>
+              , el nivel de riesgo puede subir con menos temperatura que a otra persona. Esto no es un diagnóstico
+              médico: es una guía para ayudarte a decidir cómo organizar tu día.
+            </p>
+          </Card>
+        </div>
+      </main>
+    </div>
+  )
+}

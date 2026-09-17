@@ -1,0 +1,117 @@
+@import 'tailwindcss';
+
+:root {
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+
+  --color-system-blue: #0a84ff;
+  --color-system-green: #30d158;
+  --color-system-orange: #ff9f0a;
+  --color-system-red: #ff453a;
+  --color-system-yellow: #ffd60a;
+
+  --color-label: #ffffff;
+  --color-secondary-label: rgba(235, 235, 245, 0.68);
+  --color-tertiary-label: rgba(235, 235, 245, 0.42);
+
+  --color-system-background: #0b0e14;
+  --color-secondary-background: #12172a;
+  --color-grouped-background: #0b0e14;
+
+  --color-surface: rgba(255, 255, 255, 0.06);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+
+  --risk-low: var(--color-system-green);
+  --risk-moderate: var(--color-system-yellow);
+  --risk-high: var(--color-system-orange);
+  --risk-extreme: var(--color-system-red);
+
+  --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --shadow-contact: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+/* El producto usa dark mode como identidad visual por defecto (seccion 6.5 del brief).
+   Mantenemos el mismo fondo oscuro aun si el sistema pide light, para no romper el
+   contraste ya validado de las cards; un modo light real queda para una iteracion futura. */
+@media (prefers-contrast: more) {
+  :root {
+    --color-surface: rgba(255, 255, 255, 0.12);
+    --color-surface-border: rgba(255, 255, 255, 0.28);
+    --color-secondary-label: rgba(235, 235, 245, 0.88);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at 50% 0%, #1c2333 0%, #0b0e14 60%);
+  background-color: var(--color-system-background);
+  color: var(--color-label);
+  font-family: var(--font-system);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.glass-surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-ambient), var(--shadow-contact);
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+}
+
+@media (prefers-contrast: more) {
+  .glass-surface {
+    background-image: none;
+  }
+}
+
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.hero-float {
+  animation: hero-float 3.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-float {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
