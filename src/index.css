@@ -87,6 +87,20 @@ textarea {
   }
 }
 
+/*
+ * Para paneles que flotan directo sobre contenido variable (el mapa, con sus
+ * poligonos de colores), .sheet-surface es demasiado transparente: el texto
+ * se vuelve illegible sobre un fondo que puede ser amarillo, verde o azul.
+ * Este fondo es casi opaco a proposito.
+ */
+.map-panel-surface {
+  background: rgba(11, 14, 20, 0.92);
+  border: 1px solid var(--color-surface-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--shadow-ambient), var(--shadow-contact);
+}
+
 @keyframes hero-float {
   0%,
   100% {

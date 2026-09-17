@@ -1,5 +1,6 @@
-import { CircleMarker, GeoJSON, MapContainer, Popup, TileLayer } from 'react-leaflet'
-import type { Layer, PathOptions } from 'leaflet'
+import { useState } from 'react'
+import { CircleMarker, GeoJSON, MapContainer, TileLayer } from 'react-leaflet'
+import type { Layer, Polygon, PathOptions } from 'leaflet'
 import type { Feature, FeatureCollection, Point } from 'geojson'
 import 'leaflet/dist/leaflet.css'
 import { MapPin } from 'lucide-react'
@@ -10,12 +11,14 @@ import { isWithinValencia } from '../../lib/geo/valenciaNeighborhoods'
 import {
   beachMarkerStyle,
   fountainMarkerStyle,
+  MAP_LAYERS,
   parkMarkerStyle,
   SHADE_COLORS,
-  SHADE_LABELS,
   youAreHereMarkerStyle,
-} from './mapMarkers'
-import { MapLegend } from './MapLegend'
+  type MapLayerId,
+  type SelectedMapPlace,
+} from './mapCategories'
+import { MapPanel } from './MapPanel'
 import type { ShadeBucket } from '../../types'
 
 const VALENCIA_CENTER: [number, number] = [39.4699, -0.3763]
@@ -28,13 +31,6 @@ function barrioStyle(feature?: Feature): PathOptions {
   return { fillColor: color, fillOpacity: 0.35, color, weight: 1, opacity: 0.7 }
 }
 
-function bindBarrioPopup(feature: Feature, layer: Layer) {
-  const props = feature.properties ?? {}
-  const bucket = (props.sombraBucket as ShadeBucket | null) ?? null
-  const shadeText = bucket ? `Sombra y arbolado ${SHADE_LABELS[bucket]}` : 'Sin datos de sombra'
-  layer.bindPopup(`<strong>${(props.nombre as string) ?? 'Barrio'}</strong><br />${shadeText}`)
-}
-
 function pointCoords(feature: Feature): [number, number] {
   const [lon, lat] = (feature.geometry as Point).coordinates as [number, number]
   return [lat, lon]
@@ -44,6 +40,35 @@ export function MapScreen() {
   const location = useProfileStore((s) => s.location)
   const withinValencia = location !== null && isWithinValencia(location.latitude, location.longitude)
   const { barrios, fountains, parks, beachAmenities } = useValenciaMapLayers(withinValencia)
+
+  const [visibleLayers, setVisibleLayers] = useState<Set<MapLayerId>>(
+    () => new Set(MAP_LAYERS.map((l) => l.id)),
+  )
+  const [selectedPlace, setSelectedPlace] = useState<SelectedMapPlace | null>(null)
+
+  function toggleLayer(id: MapLayerId) {
+    setVisibleLayers((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function bindBarrioClick(feature: Feature, layer: Layer) {
+    layer.on('click', () => {
+      const props = feature.properties ?? {}
+      const center = (layer as Polygon).getBounds().getCenter()
+      setSelectedPlace({
+        category: 'barrio',
+        nombre: (props.nombre as string) ?? 'Barrio',
+        lat: center.lat,
+        lon: center.lng,
+        sombraBucket: (props.sombraBucket as ShadeBucket | null) ?? null,
+        vulnerabilidadGlobal: (props.vulnerabilidadGlobal as string | null) ?? null,
+      })
+    })
+  }
 
   const center: [number, number] =
     withinValencia && location ? [location.latitude, location.longitude] : VALENCIA_CENTER
@@ -63,66 +88,103 @@ export function MapScreen() {
       )}
 
       {withinValencia && (
-        <>
-          <div className="h-[60vh] w-full">
+        <div className="relative h-[calc(100vh-8rem)] w-full">
+          {/*
+            Leaflet asigna z-index 200-700 a sus panes internos. Sin un
+            z-index explicito aca, ".leaflet-container" (position:relative
+            pero z-index:auto) no crea su propio stacking context, y esos
+            valores se comparan directo contra el z-10 del panel flotante
+            en el contexto raiz — y ganan. Este wrapper con z-0 los contiene.
+          */}
+          <div className="absolute inset-0 z-0">
             <MapContainer center={center} zoom={14} scrollWheelZoom style={{ height: '100%', width: '100%' }}>
-              <TileLayer url={DARK_TILE_URL} attribution={DARK_TILE_ATTRIBUTION} />
+            <TileLayer url={DARK_TILE_URL} attribution={DARK_TILE_ATTRIBUTION} />
 
-              {barrios && (
-                <GeoJSON data={barrios as FeatureCollection} style={barrioStyle} onEachFeature={bindBarrioPopup} />
-              )}
+            {visibleLayers.has('barrios') && barrios && (
+              <GeoJSON data={barrios as FeatureCollection} style={barrioStyle} onEachFeature={bindBarrioClick} />
+            )}
 
-              {parks &&
-                (parks as FeatureCollection).features.map((feature, i) => {
-                  const [lat, lon] = pointCoords(feature)
-                  return (
-                    <CircleMarker key={`park-${i}`} center={[lat, lon]} {...parkMarkerStyle}>
-                      <Popup>
-                        <strong>{(feature.properties?.nombre as string) ?? 'Parque'}</strong>
-                        <br />
-                        Zona verde
-                      </Popup>
-                    </CircleMarker>
-                  )
-                })}
+            {visibleLayers.has('parks') &&
+              parks &&
+              (parks as FeatureCollection).features.map((feature, i) => {
+                const [lat, lon] = pointCoords(feature)
+                return (
+                  <CircleMarker
+                    key={`park-${i}`}
+                    center={[lat, lon]}
+                    {...parkMarkerStyle}
+                    eventHandlers={{
+                      click: () =>
+                        setSelectedPlace({
+                          category: 'park',
+                          nombre: (feature.properties?.nombre as string) ?? 'Parque',
+                          lat,
+                          lon,
+                          areaM2: feature.properties?.areaM2 as number | undefined,
+                        }),
+                    }}
+                  />
+                )
+              })}
 
-              {beachAmenities &&
-                (beachAmenities as FeatureCollection).features.map((feature, i) => {
-                  const [lat, lon] = pointCoords(feature)
-                  const isShower = feature.properties?.tipo === 'ducha'
-                  return (
-                    <CircleMarker key={`beach-${i}`} center={[lat, lon]} {...beachMarkerStyle}>
-                      <Popup>
-                        <strong>{isShower ? 'Ducha de playa' : 'Lavapiés de playa'}</strong>
-                      </Popup>
-                    </CircleMarker>
-                  )
-                })}
+            {visibleLayers.has('beach') &&
+              beachAmenities &&
+              (beachAmenities as FeatureCollection).features.map((feature, i) => {
+                const [lat, lon] = pointCoords(feature)
+                const beachType = feature.properties?.tipo === 'ducha' ? 'ducha' : 'lavapies'
+                return (
+                  <CircleMarker
+                    key={`beach-${i}`}
+                    center={[lat, lon]}
+                    {...beachMarkerStyle}
+                    eventHandlers={{
+                      click: () =>
+                        setSelectedPlace({
+                          category: 'beach',
+                          nombre: beachType === 'ducha' ? 'Ducha de playa' : 'Lavapiés de playa',
+                          lat,
+                          lon,
+                          beachType,
+                        }),
+                    }}
+                  />
+                )
+              })}
 
-              {fountains &&
-                (fountains as FeatureCollection).features.map((feature, i) => {
-                  const [lat, lon] = pointCoords(feature)
-                  return (
-                    <CircleMarker key={`fountain-${i}`} center={[lat, lon]} {...fountainMarkerStyle}>
-                      <Popup>
-                        <strong>Fuente de agua pública</strong>
-                        <br />
-                        {(feature.properties?.calle as string) ?? ''}
-                      </Popup>
-                    </CircleMarker>
-                  )
-                })}
+            {visibleLayers.has('fountains') &&
+              fountains &&
+              (fountains as FeatureCollection).features.map((feature, i) => {
+                const [lat, lon] = pointCoords(feature)
+                return (
+                  <CircleMarker
+                    key={`fountain-${i}`}
+                    center={[lat, lon]}
+                    {...fountainMarkerStyle}
+                    eventHandlers={{
+                      click: () =>
+                        setSelectedPlace({
+                          category: 'fountain',
+                          nombre: (feature.properties?.calle as string) ?? 'Fuente de agua pública',
+                          lat,
+                          lon,
+                        }),
+                    }}
+                  />
+                )
+              })}
 
-              {location && (
-                <CircleMarker center={[location.latitude, location.longitude]} {...youAreHereMarkerStyle}>
-                  <Popup>Estás aquí</Popup>
-                </CircleMarker>
-              )}
+            {location && <CircleMarker center={[location.latitude, location.longitude]} {...youAreHereMarkerStyle} />}
             </MapContainer>
           </div>
 
-          <MapLegend />
-        </>
+          <MapPanel
+            visibleLayers={visibleLayers}
+            onToggleLayer={toggleLayer}
+            selectedPlace={selectedPlace}
+            onCloseDetail={() => setSelectedPlace(null)}
+            userLocation={location}
+          />
+        </div>
       )}
     </div>
   )

@@ -129,8 +129,35 @@ CARTO (`dark_all`, gratis, requiere atribución, sin API key), más tres capas d
 
 Todos los puntos se dibujan como `CircleMarker` (capa vectorial de Leaflet), no
 `Marker`+ícono: con 800+ fuentes, un nodo del DOM por marcador se nota en el
-rendimiento en celulares. Cada categoría tiene color y radio distintos, y un popup con
-el nombre al tocar — nunca depende solo del color.
+rendimiento en celulares. Cada categoría tiene color y radio distintos.
+
+**Panel flotante** (`MapPanel.tsx`, config compartida en `mapCategories.ts`): reemplaza
+los popups nativos de Leaflet por un panel propio, con 3 estados:
+
+- *Colapsado* (default): fila de botones grandes con ícono para mostrar/ocultar cada
+  capa (`visibleLayers: Set<MapLayerId>` en `MapScreen`), más una flecha para expandir.
+- *Expandido*: lo mismo, más la leyenda de sombra/arbolado con su aclaración de que es
+  una estimación, no una medición real.
+- *Detalle*: al tocar un marcador o un barrio (`selectedPlace` en `MapScreen`,
+  vía `eventHandlers.click` en cada `CircleMarker` y un listener en `onEachFeature`
+  para el `GeoJSON` de barrios). Muestra nombre, categoría, distancia real a la
+  ubicación del usuario (`haversineDistanceMeters`), un texto de "cómo te ayuda con el
+  calor" específico por categoría (`helpTextFor` en `mapCategories.ts`), y un botón
+  "Cómo llegar" (`buildDirectionsUrl`, deep link universal a Google Maps) — excepto
+  para barrios, que no son un punto de destino y en su lugar muestran la nota de
+  vulnerabilidad social por separado del dato térmico.
+
+El panel usa `.map-panel-surface` (`src/index.css`), no `.sheet-surface`: flota
+directo sobre el choropleth de colores variables del mapa, así que necesita un fondo
+casi opaco para que el texto siga siendo legible — `.sheet-surface` (pensado para el
+`BottomSheet`, que ya tiene un overlay oscuro detrás) se ve demasiado transparente ahí.
+
+Nota de implementación si se vuelve a tocar el layout del mapa: `.leaflet-container`
+tiene `position: relative` pero `z-index: auto`, así que **no** crea su propio
+stacking context — los panes internos de Leaflet (z-index 200 a 700) compiten directo
+contra el `z-index` del panel en el contexto raíz y ganan si el contenedor del mapa no
+tiene también un `z-index` explícito. Por eso `MapContainer` está envuelto en un
+`<div className="absolute inset-0 z-0">` en `MapScreen.tsx`.
 
 **Deliberadamente NO incluye** piscinas municipales ni la red oficial de "Refugios
 Climáticos": no pude verificar un dataset real y vigente para la ciudad de Valencia
