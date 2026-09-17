@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-export type TabKey = 'today' | 'alerts' | 'profile'
+export type TabKey = 'today' | 'map' | 'alerts' | 'profile'
 
 interface Tab {
   key: TabKey

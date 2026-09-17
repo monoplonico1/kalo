@@ -18,8 +18,9 @@ el perfil de salud.
 ## Alcance v1
 
 Onboarding corto (ubicación + 4 preguntas de salud), pantalla "Hoy" (sensación térmica +
-riesgo + recomendaciones), franja horaria de 24h, umbral de alerta configurable, PWA
-instalable. Local-first: **sin backend**, todo vive en `localStorage` del dispositivo.
+riesgo + recomendaciones), franja horaria de 24h, umbral de alerta configurable, tab
+"Mapa" (heatmap por barrio + fuentes/parques/playa, solo Valencia), PWA instalable.
+Local-first: **sin backend**, todo vive en `localStorage` del dispositivo.
 
 Fuera de alcance v1: multi-idioma, cuentas/login, frío extremo o calidad de aire por
 incendios, empaquetado nativo real. La excepción es Valencia: ver "Capa de barrio
@@ -114,16 +115,39 @@ ubicación del usuario y ajustar la sensación térmica con eso.
   el criterio es el mismo: bounding box + polígonos de barrio + point-in-polygon
   (`src/lib/geo/geometry.ts`), sin acoplar nada de esto al risk engine genérico.
 
+### Tab Mapa
+
+`src/components/map/MapScreen.tsx` muestra el mismo choropleth por barrio (sombra/
+arbolado, sección anterior) sobre un mapa real con `react-leaflet` + tiles oscuros de
+CARTO (`dark_all`, gratis, requiere atribución, sin API key), más tres capas de puntos:
+
+- `public/data/valencia-fuentes.geojson` — las mismas 832 fuentes de agua pública.
+- `public/data/valencia-parques.geojson` — 58 parques/jardines grandes (≥20.000 m²,
+  ej. Jardín del Turia, Parque de Cabecera), reducidos a su punto centroide para no
+  enviar los polígonos completos (el original pesa 6MB con calles y jardines chicos).
+- `public/data/valencia-playa.geojson` — duchas y lavapiés de playa.
+
+Todos los puntos se dibujan como `CircleMarker` (capa vectorial de Leaflet), no
+`Marker`+ícono: con 800+ fuentes, un nodo del DOM por marcador se nota en el
+rendimiento en celulares. Cada categoría tiene color y radio distintos, y un popup con
+el nombre al tocar — nunca depende solo del color.
+
+**Deliberadamente NO incluye** piscinas municipales ni la red oficial de "Refugios
+Climáticos": no pude verificar un dataset real y vigente para la ciudad de Valencia
+(ver la nota de "nunca inventar ubicaciones" arriba). Si se consigue esa fuente,
+agregar una capa nueva siguiendo el mismo patrón (`valenciaMapLayers.ts`).
+
 ## Estructura
 
 ```
 src/
   components/ui/        # Componentes de sistema, sin fetch ni lógica de negocio
   components/home/       # Pantalla "Hoy"
+  components/map/        # Tab "Mapa" (Leaflet, solo Valencia)
   components/onboarding/ # Flujo de bienvenida
   components/settings/   # Alertas y Perfil
   hooks/                 # useWeather, useAirQuality, useGeolocation, useRiskEngine,
-                         # useNeighborhoodContext (barrio + fuentes cercanas)
+                         # useNeighborhoodContext, useValenciaMapLayers
   lib/api/               # Cliente de Open-Meteo (forecast, air quality, geocoding)
   lib/storage/           # Persistencia en localStorage
   lib/riskEngine.ts      # Motor de riesgo puro

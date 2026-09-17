@@ -80,3 +80,15 @@ export interface NearbyFountain {
   calle: string | null
   distanceMeters: number
 }
+
+export interface ParkPoint {
+  nombre: string
+  areaM2: number
+}
+
+export type BeachAmenityType = 'ducha' | 'lavapies'
+
+export interface BeachAmenity {
+  tipo: BeachAmenityType
+  nombre: string | null
+}
