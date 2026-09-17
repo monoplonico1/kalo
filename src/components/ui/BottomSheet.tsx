@@ -32,7 +32,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="safe-bottom glass-surface relative w-full max-w-md rounded-t-[20px] rounded-b-none p-4 transition-transform duration-300 ease-out"
+        className="safe-bottom sheet-surface relative w-full max-w-md rounded-t-[20px] rounded-b-none p-4 transition-transform duration-300 ease-out"
       >
         <div className="mx-auto mb-3 h-1.5 w-9 rounded-full bg-white/20" aria-hidden />
         <h2 className="mb-3 text-[22px] font-bold">{title}</h2>

@@ -82,9 +82,9 @@ export function HomeScreen() {
         )}
 
         {view === 'upcoming' && (
-          <ul className="flex flex-col gap-3" aria-label="Pronóstico de próximos días">
+          <ul className="divide-y divide-white/10 border-y border-white/10" aria-label="Pronóstico de próximos días">
             {upcoming.map((day) => (
-              <li key={day.dateLabel} className="glass-surface flex items-center justify-between rounded-[14px] p-4">
+              <li key={day.dateLabel} className="flex items-center justify-between py-4">
                 <span className="text-[17px] font-semibold capitalize">{day.dateLabel}</span>
                 <div className="flex items-center gap-3">
                   <span className="text-[17px]">{Math.round(day.maxApparentTemperature)}°</span>

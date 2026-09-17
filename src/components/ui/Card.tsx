@@ -5,8 +5,9 @@ interface CardProps {
   className?: string
 }
 
+/** Bloque de texto sin caja: solo un acento vertical para separarlo del gradiente de fondo. */
 export function Card({ children, className = '' }: CardProps) {
-  return <div className={`glass-surface rounded-[14px] p-4 ${className}`}>{children}</div>
+  return <div className={`border-l-2 border-white/15 py-1 pl-4 ${className}`}>{children}</div>
 }
 
 interface GroupedListProps {
@@ -14,9 +15,11 @@ interface GroupedListProps {
   className?: string
 }
 
-/** Lista tipo "inset grouped" de iOS Settings: filas separadas por lineas finas dentro de una card. */
+/** Lista tipo "inset grouped" de iOS Settings, pero sin relleno: solo lineas finas entre filas. */
 export function GroupedList({ children, className = '' }: GroupedListProps) {
-  return <div className={`glass-surface divide-y divide-white/8 rounded-[14px] ${className}`}>{children}</div>
+  return (
+    <div className={`divide-y divide-white/10 border-y border-white/10 ${className}`}>{children}</div>
+  )
 }
 
 interface GroupedRowProps {
@@ -25,5 +28,5 @@ interface GroupedRowProps {
 }
 
 export function GroupedRow({ children, className = '' }: GroupedRowProps) {
-  return <div className={`flex min-h-11 items-center gap-3 px-4 py-3 ${className}`}>{children}</div>
+  return <div className={`flex min-h-11 items-center gap-3 py-3 ${className}`}>{children}</div>
 }

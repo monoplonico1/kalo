@@ -60,7 +60,7 @@ export function LocationStep({ onSelect }: LocationStepProps) {
         <span className="h-px flex-1 bg-white/10" />
       </div>
 
-      <label className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3">
+      <label className="flex items-center gap-2 border-b border-white/15 px-1 py-3">
         <Search size={20} className="text-[var(--color-secondary-label)]" aria-hidden />
         <input
           type="text"

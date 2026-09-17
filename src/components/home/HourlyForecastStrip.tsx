@@ -16,11 +16,14 @@ export function HourlyForecastStrip({ hours }: HourlyForecastStripProps) {
   return (
     <div>
       <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">Próximas 24 horas</h2>
-      <ul className="flex gap-3 overflow-x-auto pb-2" aria-label="Pronóstico horario de las próximas 24 horas">
+      <ul
+        className="flex divide-x divide-white/10 overflow-x-auto border-y border-white/10 pb-2"
+        aria-label="Pronóstico horario de las próximas 24 horas"
+      >
         {hours.map((hour) => (
           <li
             key={hour.time}
-            className="glass-surface flex min-w-16 shrink-0 flex-col items-center gap-2 rounded-[14px] px-3 py-3"
+            className="flex min-w-16 shrink-0 flex-col items-center gap-2 px-3 py-3"
           >
             <span className="text-[13px] text-[var(--color-secondary-label)]">{formatHour(hour.time)}</span>
             <span className="text-[17px] font-semibold">{Math.round(hour.apparentTemperature)}°</span>

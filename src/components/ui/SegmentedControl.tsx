@@ -17,11 +17,7 @@ export function SegmentedControl<T extends string>({
   'aria-label': ariaLabel,
 }: SegmentedControlProps<T>) {
   return (
-    <div
-      role="tablist"
-      aria-label={ariaLabel}
-      className="glass-surface flex gap-1 rounded-xl p-1"
-    >
+    <div role="tablist" aria-label={ariaLabel} className="flex gap-1 border-b border-white/10">
       {segments.map((segment) => {
         const isActive = segment.value === value
         return (
@@ -31,8 +27,10 @@ export function SegmentedControl<T extends string>({
             role="tab"
             aria-selected={isActive}
             onClick={() => onChange(segment.value)}
-            className={`min-h-9 flex-1 rounded-[10px] px-3 text-[15px] font-semibold transition-colors duration-200 ease-out ${
-              isActive ? 'bg-white/12 text-[var(--color-label)]' : 'text-[var(--color-secondary-label)]'
+            className={`min-h-11 flex-1 border-b-2 px-3 text-[15px] font-semibold transition-colors duration-200 ease-out ${
+              isActive
+                ? 'border-[var(--color-system-blue)] text-[var(--color-label)]'
+                : 'border-transparent text-[var(--color-secondary-label)]'
             }`}
           >
             {segment.label}

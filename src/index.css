@@ -69,7 +69,10 @@ textarea {
   font-family: inherit;
 }
 
-.glass-surface {
+/* Reservado para paneles que de verdad flotan sobre el resto del contenido
+   (el BottomSheet). En el resto de la app el texto vive directo sobre el
+   gradiente de fondo, separado con lineas finas en vez de cajas. */
+.sheet-surface {
   background: var(--color-surface);
   border: 1px solid var(--color-surface-border);
   backdrop-filter: blur(20px);
@@ -79,7 +82,7 @@ textarea {
 }
 
 @media (prefers-contrast: more) {
-  .glass-surface {
+  .sheet-surface {
     background-image: none;
   }
 }

@@ -21,7 +21,7 @@ export function RecommendationList({ recommendations }: RecommendationListProps)
   return (
     <div>
       <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">Para hoy</h2>
-      <div className="flex flex-col gap-3">
+      <div className="divide-y divide-white/10 border-y border-white/10">
         {recommendations.map((text) => (
           <ActionCard key={text} icon={iconFor(text)} text={text} />
         ))}
