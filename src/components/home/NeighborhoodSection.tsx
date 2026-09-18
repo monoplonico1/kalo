@@ -28,22 +28,24 @@ export function NeighborhoodSection({ neighborhood, fountains }: NeighborhoodSec
         <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">
           Tu barrio: {neighborhood.nombre}
         </h2>
-        <div className="flex items-start gap-3 border-l-2 border-[var(--hairline-strong)] py-1 pl-4">
-          <TreePine size={20} className="mt-0.5 shrink-0 text-[var(--color-system-green)]" aria-hidden />
-          <p className="text-[16px] leading-snug">
-            {shadeLabel ? (
-              <>
-                Cobertura de sombra y arbolado <strong>{shadeLabel}</strong>.{' '}
-                {neighborhood.thresholdAdjustment > 0 &&
-                  `Por tener poca sombra, sumamos ${neighborhood.thresholdAdjustment}° a tu sensación térmica de hoy.`}
-                {neighborhood.thresholdAdjustment < 0 &&
-                  `Por tener bastante sombra, restamos ${Math.abs(neighborhood.thresholdAdjustment)}° a tu sensación térmica de hoy.`}
-                {neighborhood.thresholdAdjustment === 0 && 'No ajustamos tu sensación térmica por esto.'}
-              </>
-            ) : (
-              'Todavía no tenemos datos de cobertura de sombra para esta zona.'
-            )}
-          </p>
+        <div className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]">
+          <div className="flex items-start gap-3 py-3">
+            <TreePine size={20} className="mt-0.5 shrink-0 text-[var(--color-system-green)]" aria-hidden />
+            <p className="text-[16px] leading-snug">
+              {shadeLabel ? (
+                <>
+                  Cobertura de sombra y arbolado <strong>{shadeLabel}</strong>.{' '}
+                  {neighborhood.thresholdAdjustment > 0 &&
+                    `Por tener poca sombra, sumamos ${neighborhood.thresholdAdjustment}° a tu sensación térmica de hoy.`}
+                  {neighborhood.thresholdAdjustment < 0 &&
+                    `Por tener bastante sombra, restamos ${Math.abs(neighborhood.thresholdAdjustment)}° a tu sensación térmica de hoy.`}
+                  {neighborhood.thresholdAdjustment === 0 && 'No ajustamos tu sensación térmica por esto.'}
+                </>
+              ) : (
+                'Todavía no tenemos datos de cobertura de sombra para esta zona.'
+              )}
+            </p>
+          </div>
         </div>
 
         {neighborhood.vulnerabilidadGlobal && (

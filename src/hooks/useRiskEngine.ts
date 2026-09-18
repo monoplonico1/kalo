@@ -8,6 +8,15 @@ function isNightHour(isoTime: string): boolean {
   return hour >= 20 || hour < 7
 }
 
+const HOURS_TO_SHOW = 24
+
+/** Open-Meteo devuelve el horario desde las 00:00 del dia, no desde "ahora": sin este corte, "Proximas 24 horas" mostraba horas ya pasadas. */
+function startOfCurrentHour(): number {
+  const now = new Date()
+  now.setMinutes(0, 0, 0)
+  return now.getTime()
+}
+
 export interface RiskEngineResult {
   today: RiskAssessment | null
   hourly: HourlyPoint[]
@@ -33,10 +42,14 @@ export function useRiskEngine(
     const profileAdjustment = calculateProfileAdjustment(health)
     const totalAdjustment = profileAdjustment + customThresholdOffset + neighborhoodAdjustment
 
-    const hourly: HourlyPoint[] = forecast.hourly.map((point) => ({
-      ...point,
-      risk: classifyRiskLevel(point.apparentTemperature + totalAdjustment),
-    }))
+    const currentHourStart = startOfCurrentHour()
+    const hourly: HourlyPoint[] = forecast.hourly
+      .filter((point) => new Date(point.time).getTime() >= currentHourStart)
+      .slice(0, HOURS_TO_SHOW)
+      .map((point) => ({
+        ...point,
+        risk: classifyRiskLevel(point.apparentTemperature + totalAdjustment),
+      }))
 
     return { today, hourly }
   }, [forecast, health, customThresholdOffset, neighborhoodAdjustment])

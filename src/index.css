@@ -195,5 +195,16 @@ textarea {
 }
 
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: 10px;
+  /* 10px de piso ademas del safe-area: en un navegador sin notch/home
+     indicator env(...) resuelve a 0 y quedaba sin aire abajo. */
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
