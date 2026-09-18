@@ -22,11 +22,14 @@ export interface AlertPreferences {
   customThresholdOffset: number
 }
 
+export type ThemePreference = 'dark' | 'light'
+
 export interface UserProfile {
   onboardingCompleted: boolean
   location: Location | null
   health: HealthProfile
   alerts: AlertPreferences
+  theme: ThemePreference
 }
 
 export interface HourlyPoint {

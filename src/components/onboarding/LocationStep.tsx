@@ -55,12 +55,12 @@ export function LocationStep({ onSelect }: LocationStepProps) {
       {error && <p className="text-center text-[14px] text-[var(--color-system-red)]">{error}</p>}
 
       <div className="flex items-center gap-2 text-[13px] text-[var(--color-tertiary-label)]">
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-[var(--hairline)]" />
         o buscá tu ciudad
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-[var(--hairline)]" />
       </div>
 
-      <label className="flex items-center gap-2 border-b border-white/15 px-1 py-3">
+      <label className="flex items-center gap-2 border-b border-[var(--hairline-strong)] px-1 py-3">
         <Search size={20} className="text-[var(--color-secondary-label)]" aria-hidden />
         <input
           type="text"

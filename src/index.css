@@ -3,6 +3,13 @@
 :root {
   --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
 
+  /*
+   * Estos son los colores de sistema para modo oscuro (el default de la app).
+   * En modo claro (mas abajo) se oscurecen porque el amarillo/verde/naranja
+   * vivos de iOS no llegan a 4.5:1 de contraste sobre fondo claro cuando se
+   * usan como texto (Badge). Verificado con la formula de luminancia relativa
+   * de WCAG, no a ojo.
+   */
   --color-system-blue: #0a84ff;
   --color-system-green: #30d158;
   --color-system-orange: #ff9f0a;
@@ -20,10 +27,19 @@
   --color-surface: rgba(255, 255, 255, 0.06);
   --color-surface-border: rgba(255, 255, 255, 0.08);
 
+  --hairline: rgba(255, 255, 255, 0.1);
+  --hairline-strong: rgba(255, 255, 255, 0.15);
+  --toggle-track-off: rgba(255, 255, 255, 0.16);
+
+  --gradient-center: #1c2333;
+  --gradient-edge: #0b0e14;
+
   --risk-low: var(--color-system-green);
   --risk-moderate: var(--color-system-yellow);
   --risk-high: var(--color-system-orange);
   --risk-extreme: var(--color-system-red);
+
+  --map-panel-bg: rgba(11, 14, 20, 0.92);
 
   --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.4);
   --shadow-contact: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -31,14 +47,61 @@
   color-scheme: dark;
 }
 
-/* El producto usa dark mode como identidad visual por defecto (seccion 6.5 del brief).
-   Mantenemos el mismo fondo oscuro aun si el sistema pide light, para no romper el
-   contraste ya validado de las cards; un modo light real queda para una iteracion futura. */
+/*
+ * Modo claro explicito, elegido por el usuario en Perfil (no sigue
+ * prefers-color-scheme: el default de la app es oscuro a proposito,
+ * ver seccion 6.5 del brief). Los colores de sistema se oscurecen para
+ * seguir siendo legibles como texto sobre fondo claro (Badge, botones
+ * "tinted"): verde 5.0:1, ambar 6.4:1, naranja 5.4:1, rojo 5.7:1, azul
+ * 6.7:1 contra blanco — todos pasan WCAG AA (4.5:1) para texto normal.
+ */
+:root[data-theme='light'] {
+  --color-system-blue: #1d4ed8;
+  --color-system-green: #15803d;
+  --color-system-orange: #b54708;
+  --color-system-red: #c81e1e;
+  --color-system-yellow: #7a5900;
+
+  --color-label: #000000;
+  --color-secondary-label: rgba(60, 60, 67, 0.68);
+  --color-tertiary-label: rgba(60, 60, 67, 0.42);
+
+  --color-system-background: #f2f2f7;
+  --color-secondary-background: #ffffff;
+  --color-grouped-background: #f2f2f7;
+
+  --color-surface: rgba(0, 0, 0, 0.04);
+  --color-surface-border: rgba(0, 0, 0, 0.08);
+
+  --hairline: rgba(0, 0, 0, 0.1);
+  --hairline-strong: rgba(0, 0, 0, 0.15);
+  --toggle-track-off: rgba(0, 0, 0, 0.12);
+
+  --gradient-center: #ffffff;
+  --gradient-edge: #f2f2f7;
+
+  --map-panel-bg: rgba(255, 255, 255, 0.92);
+
+  --shadow-ambient: 0 20px 40px rgba(0, 0, 0, 0.12);
+  --shadow-contact: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  color-scheme: light;
+}
+
+/* El mapa (tiles de CARTO) se queda oscuro en los dos temas a proposito:
+   es un basemap, no chrome de la app. Ver CLAUDE.md. */
+
 @media (prefers-contrast: more) {
   :root {
     --color-surface: rgba(255, 255, 255, 0.12);
     --color-surface-border: rgba(255, 255, 255, 0.28);
     --color-secondary-label: rgba(235, 235, 245, 0.88);
+  }
+
+  :root[data-theme='light'] {
+    --color-surface: rgba(0, 0, 0, 0.12);
+    --color-surface-border: rgba(0, 0, 0, 0.32);
+    --color-secondary-label: rgba(60, 60, 67, 0.88);
   }
 }
 
@@ -54,12 +117,13 @@ body,
 
 body {
   margin: 0;
-  background: radial-gradient(ellipse at 50% 0%, #1c2333 0%, #0b0e14 60%);
+  background: radial-gradient(ellipse at 50% 0%, var(--gradient-center) 0%, var(--gradient-edge) 60%);
   background-color: var(--color-system-background);
   color: var(--color-label);
   font-family: var(--font-system);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  transition: background-color 0.2s ease-out, color 0.2s ease-out;
 }
 
 button,
@@ -91,10 +155,11 @@ textarea {
  * Para paneles que flotan directo sobre contenido variable (el mapa, con sus
  * poligonos de colores), .sheet-surface es demasiado transparente: el texto
  * se vuelve illegible sobre un fondo que puede ser amarillo, verde o azul.
- * Este fondo es casi opaco a proposito.
+ * Este fondo es casi opaco a proposito, y se tematiza por separado porque el
+ * mapa en si se queda oscuro en los dos temas (ver nota arriba).
  */
 .map-panel-surface {
-  background: rgba(11, 14, 20, 0.92);
+  background: var(--map-panel-bg);
   border: 1px solid var(--color-surface-border);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);

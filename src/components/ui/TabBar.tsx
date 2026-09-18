@@ -17,7 +17,7 @@ interface TabBarProps {
 export function TabBar({ tabs, activeTab, onChange }: TabBarProps) {
   return (
     <nav
-      className="safe-bottom sticky bottom-0 z-10 flex border-t border-white/10 bg-[var(--color-system-background)]"
+      className="safe-bottom sticky bottom-0 z-10 flex border-t border-[var(--hairline)] bg-[var(--color-system-background)]"
       aria-label="Navegación principal"
     >
       {tabs.map((tab) => {

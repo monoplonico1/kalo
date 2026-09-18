@@ -17,7 +17,7 @@ export function SegmentedControl<T extends string>({
   'aria-label': ariaLabel,
 }: SegmentedControlProps<T>) {
   return (
-    <div role="tablist" aria-label={ariaLabel} className="flex gap-1 border-b border-white/10">
+    <div role="tablist" aria-label={ariaLabel} className="flex gap-1 border-b border-[var(--hairline)]">
       {segments.map((segment) => {
         const isActive = segment.value === value
         return (

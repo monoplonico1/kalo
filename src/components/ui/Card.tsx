@@ -7,7 +7,7 @@ interface CardProps {
 
 /** Bloque de texto sin caja: solo un acento vertical para separarlo del gradiente de fondo. */
 export function Card({ children, className = '' }: CardProps) {
-  return <div className={`border-l-2 border-white/15 py-1 pl-4 ${className}`}>{children}</div>
+  return <div className={`border-l-2 border-[var(--hairline-strong)] py-1 pl-4 ${className}`}>{children}</div>
 }
 
 interface GroupedListProps {
@@ -18,7 +18,7 @@ interface GroupedListProps {
 /** Lista tipo "inset grouped" de iOS Settings, pero sin relleno: solo lineas finas entre filas. */
 export function GroupedList({ children, className = '' }: GroupedListProps) {
   return (
-    <div className={`divide-y divide-white/10 border-y border-white/10 ${className}`}>{children}</div>
+    <div className={`divide-y divide-[var(--hairline)] border-y border-[var(--hairline)] ${className}`}>{children}</div>
   )
 }
 

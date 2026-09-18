@@ -43,17 +43,46 @@ manifest/service worker, `lucide-react` para iconografía de sistema.
 ## Sistema de diseño
 
 - Tipografía: font stack de sistema (`-apple-system, ...`), nunca se embebe SF Pro.
-- Dark mode como identidad visual por defecto: fondo casi negro con temperatura de
-  color (`#0B0E14`), gradiente radial sutil (`src/index.css`).
+- Dark mode como identidad visual **por defecto** (`theme: 'dark'` en el perfil), con
+  un modo claro explícito que el usuario elige en Perfil → Apariencia. Ninguno de los
+  dos sigue `prefers-color-scheme`: es una elección del usuario, no del sistema.
 - El texto vive directo sobre el gradiente de fondo, separado con líneas finas
-  (`border-white/10`, `divide-y`) en vez de cajas rellenas. La única superficie real
-  (`.sheet-surface`: vidrio esmerilado con `backdrop-filter: blur(20px)` y doble
-  sombra) es el `BottomSheet`, porque un modal sí necesita distinguirse del
-  contenido de atrás.
+  (`border-[var(--hairline)]`, `divide-y`) en vez de cajas rellenas. La única
+  superficie real (`.sheet-surface`: vidrio esmerilado con `backdrop-filter: blur(20px)`
+  y doble sombra) es el `BottomSheet`, porque un modal sí necesita distinguirse del
+  contenido de atrás — y sí se tematiza, a diferencia de `.map-panel-surface` (ver
+  "Tema claro/oscuro" más abajo).
 - El dato hero (temperatura, sensación térmica) domina la pantalla: 72–96px, bold/black.
 - Icono hero con animación sutil de flotación (`.hero-float`), desactivada
   automáticamente con `prefers-reduced-motion`.
 - Tokens de color, tipografía y spacing en `src/lib/designTokens.ts` y `src/index.css`.
+
+## Tema claro/oscuro
+
+`theme: 'dark' | 'light'` vive en el perfil (persistido en `localStorage`, igual que
+el resto), con el toggle en `ProfileScreen` (sección "Apariencia"). `App.tsx` sincroniza
+`document.documentElement.dataset.theme` con un `useEffect`, y `src/index.css` define
+los tokens de color dos veces: una vez en `:root` (oscuro, el default) y otra vez bajo
+`:root[data-theme='light']`.
+
+- **Los colores de sistema se oscurecen en claro**: `--color-system-green/yellow/
+  orange/red/blue` no son los mismos hex en los dos temas. El amarillo/verde/naranja
+  vivos de iOS no llegan a 4.5:1 de contraste sobre fondo blanco usados como texto
+  (`Badge`, `Button` tinted/plain) — se verificó con la fórmula de luminancia relativa
+  de WCAG, no a ojo (verde 5.0:1, ámbar 6.4:1, naranja 5.4:1, rojo 5.7:1, azul 6.7:1
+  contra blanco). Como `--risk-low/moderate/high/extreme` son alias de estos mismos
+  tokens, el `Badge` de riesgo queda accesible en los dos temas sin tocar su código.
+- **Líneas y superficies pasan por variables, nunca `white/NN` literal**: `--hairline`,
+  `--hairline-strong` y `--toggle-track-off` son blancos translúcidos en oscuro y
+  negros translúcidos en claro. Si agregás un divisor nuevo, usá
+  `border-[var(--hairline)]`, no `border-white/10` — ese literal no se ve en claro.
+- **El mapa se queda oscuro en los dos temas**: los tiles de CARTO (`dark_all`) y el
+  choropleth de barrios no cambian con el tema de la app — es un basemap, no chrome.
+  `.map-panel-surface` (el panel flotante del mapa) sí se tematiza, pero por separado
+  de `.sheet-surface`, con su propio `--map-panel-bg`, porque necesita quedar legible
+  flotando sobre ese basemap oscuro fijo en los dos temas.
+- `BottomSheet` (`.sheet-surface`) sí sigue el tema de la app normalmente, como
+  cualquier hoja nativa de iOS.
 
 ## Accesibilidad (no es opcional)
 

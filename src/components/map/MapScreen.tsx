@@ -4,7 +4,6 @@ import type { Layer, Polygon, PathOptions } from 'leaflet'
 import type { Feature, FeatureCollection, Point } from 'geojson'
 import 'leaflet/dist/leaflet.css'
 import { MapPin } from 'lucide-react'
-import { NavigationBar } from '../ui/NavigationBar'
 import { useProfileStore } from '../../store/useProfileStore'
 import { useValenciaMapLayers } from '../../hooks/useValenciaMapLayers'
 import { isWithinValencia } from '../../lib/geo/valenciaNeighborhoods'
@@ -75,10 +74,8 @@ export function MapScreen() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <NavigationBar title="Mapa" large={false} />
-
       {!withinValencia && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
+        <div className="safe-top flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
           <MapPin size={40} className="text-[var(--color-secondary-label)]" aria-hidden />
           <p className="text-[17px] text-[var(--color-secondary-label)]">
             El mapa de calor por barrio está disponible por ahora solo para Valencia. Estamos evaluando sumar más
@@ -88,7 +85,7 @@ export function MapScreen() {
       )}
 
       {withinValencia && (
-        <div className="relative h-[calc(100vh-8rem)] w-full">
+        <div className="safe-top relative h-[calc(100vh-4.5rem)] w-full">
           {/*
             Leaflet asigna z-index 200-700 a sus panes internos. Sin un
             z-index explicito aca, ".leaflet-container" (position:relative

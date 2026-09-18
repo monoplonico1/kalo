@@ -17,7 +17,7 @@ export function HourlyForecastStrip({ hours }: HourlyForecastStripProps) {
     <div>
       <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">Próximas 24 horas</h2>
       <ul
-        className="flex divide-x divide-white/10 overflow-x-auto border-y border-white/10 pb-2"
+        className="flex divide-x divide-[var(--hairline)] overflow-x-auto border-y border-[var(--hairline)] pb-2"
         aria-label="Pronóstico horario de las próximas 24 horas"
       >
         {hours.map((hour) => (

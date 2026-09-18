@@ -16,6 +16,7 @@ export const defaultProfile: UserProfile = {
     notificationsEnabled: false,
     customThresholdOffset: 0,
   },
+  theme: 'dark',
 }
 
 export function loadProfile(): UserProfile {

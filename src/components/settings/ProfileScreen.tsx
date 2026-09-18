@@ -1,6 +1,7 @@
 import { MapPin } from 'lucide-react'
 import { NavigationBar } from '../ui/NavigationBar'
 import { Card, GroupedList, GroupedRow } from '../ui/Card'
+import { SegmentedControl } from '../ui/SegmentedControl'
 import { ProfileStep } from '../onboarding/ProfileStep'
 import { useProfileStore } from '../../store/useProfileStore'
 import { calculateProfileAdjustment } from '../../lib/riskEngine'
@@ -10,6 +11,8 @@ export function ProfileScreen() {
   const location = useProfileStore((s) => s.location)
   const health = useProfileStore((s) => s.health)
   const updateHealth = useProfileStore((s) => s.updateHealth)
+  const theme = useProfileStore((s) => s.theme)
+  const setTheme = useProfileStore((s) => s.setTheme)
   const { data: neighborhood } = useNeighborhoodContext(location)
 
   const adjustment = calculateProfileAdjustment(health)
@@ -26,6 +29,19 @@ export function ProfileScreen() {
             </GroupedRow>
           </GroupedList>
         )}
+
+        <div>
+          <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">Apariencia</h2>
+          <SegmentedControl
+            aria-label="Tema de la aplicación"
+            value={theme}
+            onChange={setTheme}
+            segments={[
+              { value: 'dark', label: 'Oscuro' },
+              { value: 'light', label: 'Claro' },
+            ]}
+          />
+        </div>
 
         <ProfileStep
           health={health}

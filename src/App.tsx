@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Bell, Map, Sun, User } from 'lucide-react'
 import { TabBar, type TabKey } from './components/ui/TabBar'
@@ -43,6 +43,12 @@ function MainApp() {
 
 function App() {
   const onboardingCompleted = useProfileStore((s) => s.onboardingCompleted)
+  const theme = useProfileStore((s) => s.theme)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#F2F2F7' : '#0B0E14')
+  }, [theme])
 
   return (
     <QueryClientProvider client={queryClient}>

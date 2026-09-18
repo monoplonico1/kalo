@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { NavigationBar } from '../ui/NavigationBar'
 import { SegmentedControl } from '../ui/SegmentedControl'
 import { Badge } from '../ui/Badge'
 import { RiskCard } from './RiskCard'
@@ -58,8 +57,7 @@ export function HomeScreen() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <NavigationBar title={cityLabel} />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-4 pb-24">
+      <main className="safe-top flex flex-1 flex-col gap-5 px-4 pt-4 pb-24">
         <SegmentedControl
           aria-label="Vista de pronóstico"
           value={view}
@@ -87,7 +85,7 @@ export function HomeScreen() {
         )}
 
         {view === 'upcoming' && (
-          <ul className="divide-y divide-white/10 border-y border-white/10" aria-label="Pronóstico de próximos días">
+          <ul className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]" aria-label="Pronóstico de próximos días">
             {upcoming.map((day) => (
               <li key={day.dateLabel} className="flex items-center justify-between py-4">
                 <span className="text-[17px] font-semibold capitalize">{day.dateLabel}</span>

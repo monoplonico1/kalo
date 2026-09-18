@@ -13,7 +13,7 @@ export function Toggle({ checked, onChange, label }: ToggleProps) {
       aria-label={label}
       onClick={() => onChange(!checked)}
       className={`relative h-8 w-[51px] shrink-0 rounded-full transition-colors duration-200 ease-out ${
-        checked ? 'bg-[var(--color-system-green)]' : 'bg-white/16'
+        checked ? 'bg-[var(--color-system-green)]' : 'bg-[var(--toggle-track-off)]'
       }`}
     >
       <span

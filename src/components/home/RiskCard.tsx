@@ -13,7 +13,7 @@ export function RiskCard({ cityLabel, apparentTemperature, assessment }: RiskCar
     <section
       role="alert"
       aria-label={`Sensación térmica ${Math.round(apparentTemperature)} grados en ${cityLabel}, ${assessment.level === 'low' ? 'riesgo bajo' : assessment.level === 'moderate' ? 'riesgo moderado' : assessment.level === 'high' ? 'riesgo alto' : 'riesgo extremo'}`}
-      className="flex flex-col items-center gap-3 border-b border-white/10 px-4 py-8 text-center"
+      className="flex flex-col items-center gap-3 border-b border-[var(--hairline)] px-4 py-8 text-center"
     >
       <div className="hero-float relative flex h-24 w-24 items-center justify-center">
         <div
