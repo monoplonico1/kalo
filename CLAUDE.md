@@ -125,10 +125,13 @@ de un lanzamiento real.
 ### El número hero es personalizado, no el dato genérico de la ciudad
 
 `RiskCard` muestra `assessment.effectiveApparentTemperature` (oficial + perfil + barrio)
-como el número gigante, no `apparentTemperature` cruda. Cuando el ajuste es distinto de
-cero, el caption debajo aclara `"Estimado para vos en {ciudad} · oficial {temp}°"`; si no
-hay ningún ajuste (perfil sin factores de riesgo, sin datos de barrio), el número
-coincide con el oficial y el caption vuelve a ser genérico. Esto es deliberado: Kaló
+como el número gigante, no `apparentTemperature` cruda. El caption debajo **siempre**
+dice "tu", nunca solo el nombre de la ciudad — decir "Sensación térmica en Valencia" da
+la idea de que es el dato genérico de la ciudad, aunque el número ya esté ajustado.
+Cuando el ajuste es distinto de cero: `"Tu sensación estimada en {ciudad} · oficial
+{temp}°"`. Sin ningún ajuste (perfil sin factores de riesgo, sin datos de barrio): el
+número coincide con el oficial y el caption es `"Tu sensación térmica en {ciudad}"` —
+sigue en primera persona, no cae de vuelta a la redacción genérica. Esto es deliberado: Kaló
 partió pareciendo "Open-Meteo con mejor diseño" — el mismo dato que cualquier app de
 clima, solo que con más diseño encima. Mostrar el ajuste en el número principal (no
 solo en el nivel de riesgo, que antes era la única cosa personalizada) es lo que hace
