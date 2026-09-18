@@ -128,8 +128,10 @@ de un lanzamiento real.
 como el número gigante, no `apparentTemperature` cruda. El caption debajo **siempre**
 dice "tu", nunca solo el nombre de la ciudad — decir "Sensación térmica en Valencia" da
 la idea de que es el dato genérico de la ciudad, aunque el número ya esté ajustado.
-Cuando el ajuste es distinto de cero: `"Tu sensación estimada en {ciudad} · oficial
-{temp}°"`. Sin ningún ajuste (perfil sin factores de riesgo, sin datos de barrio): el
+Cuando el ajuste es distinto de cero: `"Sensación estimada en tu zona · oficial
+{temp}°"` — sin nombrar la ciudad, porque en ese caso el numero ya no es el dato de la
+ciudad sino de tu barrio/perfil especifico. Sin ningún ajuste (perfil sin factores de
+riesgo, sin datos de barrio): el
 número coincide con el oficial y el caption es `"Tu sensación térmica en {ciudad}"` —
 sigue en primera persona, no cae de vuelta a la redacción genérica. Esto es deliberado: Kaló
 partió pareciendo "Open-Meteo con mejor diseño" — el mismo dato que cualquier app de

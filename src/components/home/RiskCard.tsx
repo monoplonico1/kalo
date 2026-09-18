@@ -23,7 +23,11 @@ export function RiskCard({ cityLabel, apparentTemperature, assessment }: RiskCar
   return (
     <section
       role="alert"
-      aria-label={`Tu sensación térmica estimada, ${heroTemperature} grados en ${cityLabel}${isPersonalized ? `, oficial ${officialTemperature} grados` : ''}, ${LEVEL_TEXT[assessment.level]}`}
+      aria-label={
+        isPersonalized
+          ? `Sensación estimada en tu zona, ${heroTemperature} grados, oficial ${officialTemperature} grados en ${cityLabel}, ${LEVEL_TEXT[assessment.level]}`
+          : `Tu sensación térmica, ${heroTemperature} grados en ${cityLabel}, ${LEVEL_TEXT[assessment.level]}`
+      }
       className="flex flex-col items-center gap-3 border-b border-[var(--hairline)] px-4 py-8 text-center"
     >
       <div className="hero-float relative flex h-24 w-24 items-center justify-center">
@@ -38,9 +42,7 @@ export function RiskCard({ cityLabel, apparentTemperature, assessment }: RiskCar
       <p className="text-[80px] font-black leading-none tracking-tight">{heroTemperature}°</p>
       <p className="text-[16px] text-[var(--color-secondary-label)]">
         {isPersonalized ? (
-          <>
-            Tu sensación estimada en {cityLabel} · oficial {officialTemperature}°
-          </>
+          <>Sensación estimada en tu zona · oficial {officialTemperature}°</>
         ) : (
           <>Tu sensación térmica en {cityLabel}</>
         )}
