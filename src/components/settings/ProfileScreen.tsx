@@ -1,7 +1,6 @@
 import { MapPin } from 'lucide-react'
-import { NavigationBar } from '../ui/NavigationBar'
 import { Card, GroupedList, GroupedRow } from '../ui/Card'
-import { SegmentedControl } from '../ui/SegmentedControl'
+import { Toggle } from '../ui/Toggle'
 import { ProfileStep } from '../onboarding/ProfileStep'
 import { useProfileStore } from '../../store/useProfileStore'
 import { calculateProfileAdjustment } from '../../lib/riskEngine'
@@ -19,8 +18,7 @@ export function ProfileScreen() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <NavigationBar title="Perfil" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-4 pb-24">
+      <main className="safe-top flex flex-1 flex-col gap-5 px-4 pt-6 pb-24">
         {location && (
           <GroupedList>
             <GroupedRow className="gap-3">
@@ -32,15 +30,16 @@ export function ProfileScreen() {
 
         <div>
           <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">Apariencia</h2>
-          <SegmentedControl
-            aria-label="Tema de la aplicación"
-            value={theme}
-            onChange={setTheme}
-            segments={[
-              { value: 'dark', label: 'Oscuro' },
-              { value: 'light', label: 'Claro' },
-            ]}
-          />
+          <GroupedList>
+            <GroupedRow className="justify-between">
+              <span className="text-[17px]">Modo claro</span>
+              <Toggle
+                label="Modo claro"
+                checked={theme === 'light'}
+                onChange={(checked) => setTheme(checked ? 'light' : 'dark')}
+              />
+            </GroupedRow>
+          </GroupedList>
         </div>
 
         <ProfileStep

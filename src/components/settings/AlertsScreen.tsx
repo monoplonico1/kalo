@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { NavigationBar } from '../ui/NavigationBar'
 import { GroupedList, GroupedRow, Card } from '../ui/Card'
 import { Toggle } from '../ui/Toggle'
 import { BottomSheet } from '../ui/BottomSheet'
@@ -22,8 +21,7 @@ export function AlertsScreen() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <NavigationBar title="Alertas" />
-      <main className="flex flex-1 flex-col gap-5 px-4 py-4 pb-24">
+      <main className="safe-top flex flex-1 flex-col gap-5 px-4 pt-6 pb-24">
         <GroupedList>
           <GroupedRow className="justify-between">
             <span className="text-[17px]">Notificaciones</span>

@@ -5,8 +5,9 @@ import type { Feature, FeatureCollection, Point } from 'geojson'
 import 'leaflet/dist/leaflet.css'
 import { MapPin } from 'lucide-react'
 import { useProfileStore } from '../../store/useProfileStore'
+import { useWeather } from '../../hooks/useWeather'
 import { useValenciaMapLayers } from '../../hooks/useValenciaMapLayers'
-import { isWithinValencia } from '../../lib/geo/valenciaNeighborhoods'
+import { isWithinValencia, SHADE_ADJUSTMENT } from '../../lib/geo/valenciaNeighborhoods'
 import {
   beachMarkerStyle,
   fountainMarkerStyle,
@@ -39,6 +40,7 @@ export function MapScreen() {
   const location = useProfileStore((s) => s.location)
   const withinValencia = location !== null && isWithinValencia(location.latitude, location.longitude)
   const { barrios, fountains, parks, beachAmenities } = useValenciaMapLayers(withinValencia)
+  const { data: forecast } = useWeather(location)
 
   const [visibleLayers, setVisibleLayers] = useState<Set<MapLayerId>>(
     () => new Set(MAP_LAYERS.map((l) => l.id)),
@@ -58,13 +60,21 @@ export function MapScreen() {
     layer.on('click', () => {
       const props = feature.properties ?? {}
       const center = (layer as Polygon).getBounds().getCenter()
+      const sombraBucket = (props.sombraBucket as ShadeBucket | null) ?? null
+      const officialTemperature = forecast?.current.apparentTemperature
+      const estimatedApparentTemperature =
+        officialTemperature !== undefined
+          ? officialTemperature + (sombraBucket ? SHADE_ADJUSTMENT[sombraBucket] : 0)
+          : undefined
+
       setSelectedPlace({
         category: 'barrio',
         nombre: (props.nombre as string) ?? 'Barrio',
         lat: center.lat,
         lon: center.lng,
-        sombraBucket: (props.sombraBucket as ShadeBucket | null) ?? null,
+        sombraBucket,
         vulnerabilidadGlobal: (props.vulnerabilidadGlobal as string | null) ?? null,
+        estimatedApparentTemperature,
       })
     })
   }

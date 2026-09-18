@@ -8,11 +8,22 @@ interface RiskCardProps {
   assessment: RiskAssessment
 }
 
+const LEVEL_TEXT: Record<RiskAssessment['level'], string> = {
+  low: 'riesgo bajo',
+  moderate: 'riesgo moderado',
+  high: 'riesgo alto',
+  extreme: 'riesgo extremo',
+}
+
 export function RiskCard({ cityLabel, apparentTemperature, assessment }: RiskCardProps) {
+  const officialTemperature = Math.round(apparentTemperature)
+  const heroTemperature = Math.round(assessment.effectiveApparentTemperature)
+  const isPersonalized = assessment.thresholdAdjustment !== 0
+
   return (
     <section
       role="alert"
-      aria-label={`Sensación térmica ${Math.round(apparentTemperature)} grados en ${cityLabel}, ${assessment.level === 'low' ? 'riesgo bajo' : assessment.level === 'moderate' ? 'riesgo moderado' : assessment.level === 'high' ? 'riesgo alto' : 'riesgo extremo'}`}
+      aria-label={`Sensación térmica ${isPersonalized ? `estimada para vos ${heroTemperature}` : heroTemperature} grados en ${cityLabel}${isPersonalized ? `, oficial ${officialTemperature} grados` : ''}, ${LEVEL_TEXT[assessment.level]}`}
       className="flex flex-col items-center gap-3 border-b border-[var(--hairline)] px-4 py-8 text-center"
     >
       <div className="hero-float relative flex h-24 w-24 items-center justify-center">
@@ -24,8 +35,16 @@ export function RiskCard({ cityLabel, apparentTemperature, assessment }: RiskCar
         <Sun size={72} strokeWidth={1.5} className="relative text-[var(--color-system-orange)]" aria-hidden />
       </div>
 
-      <p className="text-[80px] font-black leading-none tracking-tight">{Math.round(apparentTemperature)}°</p>
-      <p className="text-[16px] text-[var(--color-secondary-label)]">Sensación térmica en {cityLabel}</p>
+      <p className="text-[80px] font-black leading-none tracking-tight">{heroTemperature}°</p>
+      <p className="text-[16px] text-[var(--color-secondary-label)]">
+        {isPersonalized ? (
+          <>
+            Estimado para vos en {cityLabel} · oficial {officialTemperature}°
+          </>
+        ) : (
+          <>Sensación térmica en {cityLabel}</>
+        )}
+      </p>
 
       <Badge level={assessment.level} />
     </section>

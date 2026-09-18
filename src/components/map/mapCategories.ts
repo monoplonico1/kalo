@@ -75,6 +75,8 @@ export interface SelectedMapPlace {
   vulnerabilidadGlobal?: string | null
   areaM2?: number
   beachType?: 'ducha' | 'lavapies'
+  /** Solo para barrios: oficial de la ciudad + ajuste de sombra del barrio (sin perfil de salud, es sobre el lugar). */
+  estimatedApparentTemperature?: number
 }
 
 export const CATEGORY_LABELS: Record<MapCategory, string> = {

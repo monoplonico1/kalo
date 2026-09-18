@@ -28,7 +28,7 @@ export function NeighborhoodSection({ neighborhood, fountains }: NeighborhoodSec
         <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">
           Tu barrio: {neighborhood.nombre}
         </h2>
-        <div className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]">
+        <div className="divide-y divide-[var(--hairline)]">
           <div className="flex items-start gap-3 py-3">
             <TreePine size={20} className="mt-0.5 shrink-0 text-[var(--color-system-green)]" aria-hidden />
             <p className="text-[16px] leading-snug">
@@ -61,7 +61,7 @@ export function NeighborhoodSection({ neighborhood, fountains }: NeighborhoodSec
           <h2 className="mb-2 text-[13px] font-semibold text-[var(--color-secondary-label)]">
             Fuentes de agua pública cerca
           </h2>
-          <div className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]">
+          <div className="divide-y divide-[var(--hairline)]">
             {fountains.map((fountain, i) => (
               <div key={`${fountain.calle}-${i}`} className="flex items-start gap-3 py-3">
                 <Droplets size={20} className="mt-0.5 shrink-0 text-[var(--color-system-blue)]" aria-hidden />

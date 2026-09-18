@@ -127,6 +127,15 @@ export function MapPanel({ visibleLayers, onToggleLayer, selectedPlace, onCloseD
         </div>
 
         <div className="flex flex-col gap-3 px-4 pb-4">
+          {selectedPlace.category === 'barrio' && selectedPlace.estimatedApparentTemperature !== undefined && (
+            <div className="flex items-baseline gap-2">
+              <p className="text-[44px] font-black leading-none tracking-tight">
+                {Math.round(selectedPlace.estimatedApparentTemperature)}°
+              </p>
+              <p className="text-[13px] text-[var(--color-secondary-label)]">estimado en este barrio ahora</p>
+            </div>
+          )}
+
           <p className="text-[16px] leading-snug">{helpTextFor(selectedPlace)}</p>
 
           {selectedPlace.category === 'barrio' && selectedPlace.vulnerabilidadGlobal && (

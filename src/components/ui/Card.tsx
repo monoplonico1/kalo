@@ -15,11 +15,13 @@ interface GroupedListProps {
   className?: string
 }
 
-/** Lista tipo "inset grouped" de iOS Settings, pero sin relleno: solo lineas finas entre filas. */
+/**
+ * Filas agrupadas bajo un mismo label. Solo lleva linea entre filas cuando hay
+ * mas de una — un grupo de un solo item no necesita encierre, la jerarquia la
+ * da el label de arriba (tamaño/color), no una caja.
+ */
 export function GroupedList({ children, className = '' }: GroupedListProps) {
-  return (
-    <div className={`divide-y divide-[var(--hairline)] border-y border-[var(--hairline)] ${className}`}>{children}</div>
-  )
+  return <div className={`divide-y divide-[var(--hairline)] ${className}`}>{children}</div>
 }
 
 interface GroupedRowProps {

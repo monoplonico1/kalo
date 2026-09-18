@@ -85,7 +85,7 @@ export function HomeScreen() {
         )}
 
         {view === 'upcoming' && (
-          <ul className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]" aria-label="Pronóstico de próximos días">
+          <ul className="divide-y divide-[var(--hairline)]" aria-label="Pronóstico de próximos días">
             {upcoming.map((day) => (
               <li key={day.dateLabel} className="flex items-center justify-between py-4">
                 <span className="text-[17px] font-semibold capitalize">{day.dateLabel}</span>

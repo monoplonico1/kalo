@@ -52,6 +52,17 @@ manifest/service worker, `lucide-react` para iconografía de sistema.
   y doble sombra) es el `BottomSheet`, porque un modal sí necesita distinguirse del
   contenido de atrás — y sí se tematiza, a diferencia de `.map-panel-surface` (ver
   "Tema claro/oscuro" más abajo).
+- **Sin `NavigationBar`/headers en ninguna pantalla**: se probó y se sacó — un título
+  grande arriba de cada pantalla no agregaba nada (la pestaña activa del `TabBar` ya
+  dice dónde estás) y en modo claro el brillo del gradiente detrás del texto se veía
+  sucio. El componente `NavigationBar` queda en `components/ui/` sin uso por ahora;
+  no reintroducirlo salvo que haga falta un botón de acción en el header.
+  Cada pantalla arranca con `<main className="safe-top ...">` directo.
+- **La jerarquía la dan tamaño y color de texto, no líneas decorativas**: `GroupedList`
+  (`Card.tsx`) solo pone `divide-y` *entre* filas cuando hay más de una — un grupo de
+  un solo item no lleva ninguna línea, ni de encierre arriba/abajo. Antes tenía
+  `border-y` enmarcando incluso grupos de 1 fila; se sacó porque no separaba nada, solo
+  decoraba. El label chico en mayúsculas/gris arriba de cada grupo ya hace ese trabajo.
 - El dato hero (temperatura, sensación térmica) domina la pantalla: 72–96px, bold/black.
 - Icono hero con animación sutil de flotación (`.hero-float`), desactivada
   automáticamente con `prefers-reduced-motion`.
@@ -111,6 +122,19 @@ de un lanzamiento real.
 - Si hay contexto de barrio (ver abajo), su `thresholdAdjustment` se suma por separado
   (no está capado junto con el de perfil): ver `useRiskEngine`.
 
+### El número hero es personalizado, no el dato genérico de la ciudad
+
+`RiskCard` muestra `assessment.effectiveApparentTemperature` (oficial + perfil + barrio)
+como el número gigante, no `apparentTemperature` cruda. Cuando el ajuste es distinto de
+cero, el caption debajo aclara `"Estimado para vos en {ciudad} · oficial {temp}°"`; si no
+hay ningún ajuste (perfil sin factores de riesgo, sin datos de barrio), el número
+coincide con el oficial y el caption vuelve a ser genérico. Esto es deliberado: Kaló
+partió pareciendo "Open-Meteo con mejor diseño" — el mismo dato que cualquier app de
+clima, solo que con más diseño encima. Mostrar el ajuste en el número principal (no
+solo en el nivel de riesgo, que antes era la única cosa personalizada) es lo que hace
+que la personalización se note de entrada, no que haya que leer letra chica para
+encontrarla.
+
 ## Capa de barrio (Valencia)
 
 Kaló empezó como "Open-Meteo con mejor diseño" — un dato genérico, igual que la alerta
@@ -143,6 +167,10 @@ ubicación del usuario y ajustar la sensación térmica con eso.
 - **Este patrón es reusable**: para agregar otra ciudad con datos abiertos similares,
   el criterio es el mismo: bounding box + polígonos de barrio + point-in-polygon
   (`src/lib/geo/geometry.ts`), sin acoplar nada de esto al risk engine genérico.
+- **`SHADE_ADJUSTMENT` está exportado** (no es un detalle privado del módulo):
+  `MapScreen` lo reusa para calcular la temperatura estimada al tocar un barrio en el
+  mapa (ver "Tab Mapa" abajo), así el mismo número (+1.5° a -0.5° según sombra) no se
+  duplica con otra constante que se pueda desalinear con el tiempo.
 
 ### Tab Mapa
 
@@ -175,6 +203,15 @@ los popups nativos de Leaflet por un panel propio, con 3 estados:
   "Cómo llegar" (`buildDirectionsUrl`, deep link universal a Google Maps) — excepto
   para barrios, que no son un punto de destino y en su lugar muestran la nota de
   vulnerabilidad social por separado del dato térmico.
+- **Tocar un barrio muestra una temperatura real, no solo la etiqueta de sombra**:
+  `MapScreen` llama a `useWeather(location)` (mismo `queryKey` que `HomeScreen`, así
+  que react-query lo cachea sin pegarle una segunda vez a Open-Meteo) y calcula
+  `estimatedApparentTemperature = oficial + SHADE_ADJUSTMENT[sombraBucket]` al armar el
+  `selectedPlace` del barrio tocado. A propósito **no** suma el ajuste de perfil de
+  salud del usuario ahí: el mapa compara lugares entre sí (por eso "buscar focos de
+  calor y puntos frescos" es el objetivo), no cómo le pega el calor a la persona que
+  mira — eso ya lo hace el número personalizado de `RiskCard` en Hoy. Mismo
+  `SHADE_ADJUSTMENT` que usa `findBarrio` en `useNeighborhoodContext`, no una copia.
 
 El panel usa `.map-panel-surface` (`src/index.css`), no `.sheet-surface`: flota
 directo sobre el choropleth de colores variables del mapa, así que necesita un fondo

@@ -55,7 +55,7 @@ interface FountainFeature {
  * medicion real de temperatura por barrio, es una estimacion documentada en
  * la literatura de islas de calor urbana, deliberadamente chica.
  */
-const SHADE_ADJUSTMENT: Record<ShadeBucket, number> = {
+export const SHADE_ADJUSTMENT: Record<ShadeBucket, number> = {
   muy_baja: 1.5,
   baja: 1,
   media: 0.5,
